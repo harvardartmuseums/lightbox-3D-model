@@ -1,0 +1,27 @@
+
+body 
+{
+	background: #5a5a5a;
+	margin: 0px;
+	padding: 0px;
+	font-family: "Neutral Regular 3";
+	/*font-family: Helvetica, Arial, sans-serif;*/
+	font-size: 14px;
+	overflow: hidden;
+}
+
+a { 
+	color: #ff0000; 
+}
+
+#threeJS_webGL, #threeJS_css3D {
+	position: absolute;
+	z-index: 10;
+	top: 0px;
+	left: 0px
+} 
+
+#stats { position: absolute; top:0; left: 0 }
+#stats #fps { background: transparent !important }
+#stats #fps #fpsText { color: #abc !important }
+#stats #fps #fpsGraph { display: none }
