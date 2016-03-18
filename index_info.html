@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+
+<head>
+    <meta charset="utf-8"/>
+    <title> Lightbox Gallery: Information </title> 
+    <link type="text/css" rel="stylesheet" href="http://fonts.typotheque.com/WF-023797-007265.css" />
+    <style type="text/css">
+        body { 
+            background: #ffffff;
+            background-size: 1920px 1080px;
+            margin: 0;
+            padding: 0;
+            color: #626262;
+            font-family: "Neutral Regular 3";
+            font-size: 12px;
+        }
+        h1 {
+            font-family: "Neutral Regular 3";
+            font-size: 16px;
+            font-weight: normal;    /* bold; */
+            font-style: normal;
+            font-variant: normal;   /* small-caps; */
+            text-transform: none;   /* uppercase; */
+            text-align: left;       /* center; */
+            text-decoration: none;
+            line-height: 32px;
+            letter-spacing: normal;
+            color: #000000;   /*#626262;*/
+            margin: 0;
+            padding: 0;
+            display: block;
+            opacity: 1.0;
+            transition: opacity 0.3s ease-in-out 0s;
+            -moz-transition: opacity 0.3s ease-in-out 0s;
+            -webkit-transition: opacity 0.3s ease-in-out 0s;
+        }
+        h2 {
+            font-size: 16px;
+            font-weight: normal; 
+            text-transform: none;  
+            text-decoration: underline;
+            color: #000000;
+        }
+        h3 {
+            font-size: 20px;
+            font-weight: bold; 
+            text-transform: uppercase;
+            text-decoration: none;
+            color: #000000;
+        }
+        #content {
+            background: none;
+            position: absolute;
+            /*z-index: 1;*/
+            width: 1024px;
+            /*height: 1080px;*/
+            top:  0; /*50%;*/ 
+            left: 50%; 
+            margin-right: -50%;
+            transform: translate(-50%, 0);          /*(-50%, -50%);*/
+            -ms-transform: translate(-50%, 0);      /*(-50%, -50%);*/
+            -webkit-transform: translate(-50%, 0);  /*(-50%, -50%);*/
+            display: block;
+        }
+        #conent_header {
+            width: 1024px;
+            display: block;
+        }
+        #conent_intro, #conent_instr {
+            position: relative;
+            float: left;
+            width: 466px;
+            display: inline;
+            margin: 0;
+            padding: 0;
+        }
+        #conent_intro {
+            margin-right: 84px;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="css/style.css" /> -->
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript"></script>      
+</head> 
+
+
+<body> 
+    <div id="content">
+        <div id="conent_header">
+            <img src="img/other/ham_logo.jpg" width="340px" style="margin:40px 0 40px 0;"/>
+        </div>
+        <div id="conent_intro">
+            <h3> Introduction: The Lightbox Gallery </h3>
+            <h1>
+                The Lightbox Gallery is a venue for digital experimentation —a space for projects that respond to the museums’ collections through new media and emerging technologies. Developed in collaboration with faculty, staff, students, and visiting artists, the projects showcased here use digital tools to reveal connections between objects and to play with traditional forms of display. Some of these projects are responsive, allowing users to navigate and manipulate the collections; others are cinematic, transforming the museums into a landscape of digital performance. Exploration in the Lightbox is cross-disciplinary, merging a gallery experience with a digital lab.
+            </h1>
+            <br>
+            <img src="img/other/5000_location_1.jpg" width="466px" style="margin:40px 0 40px 0;"/>
+            <img src="img/other/5000_location_2.jpg" width="466px" style="margin:40px 0 40px 0;"/>
+        </div>
+        <div id="conent_instr">
+            <h3> Instructions of the Frameworks </h3>
+            <h2> On View </h2>
+                <h1> 
+                (In)visible: Light in Astronomy and Art Conservation.
+                Art Case Study 1 — Vincent van Gogh’s Three Pairs of Shoes. Press the right/left arrow key to move the slider; Press the up arrow key to toggle teh annotation; Press the Enter key to go back to the menu.   
+                <!-- The project that is on display in the Lightbox Gallery today. --> 
+                </h1>
+                <br>
+            <h2> 1. APPC </h2>
+                <h1> 
+                American Professional Photographer Collection in the Harvard Art Museums. Non-interactive.
+                </h1>
+                <br>
+            <h2> 2. HAM Archives </h2>
+                <h1> 
+                Harvard Art Museums Archives. Non-interactive. 
+                </h1>
+                <br>
+            <h2> 3. Anthro 1650 </h2>
+                <h1> 
+                Thinking with Collections. Press t/y/u/b/n/m key to hear each of the six student talk about their research.
+                </h1>
+                <br>
+            <h2> 4. Feke </h2>
+                <h1> 
+                A painting viewer for Robert Feke's Isaac Royall and His Family. Press the enter key to switch between the visble light photograph and x-radiograph; Press the up/down arrow key to change the transparency of the visble light photograph.   
+                </h1>
+                <br>
+            <h2> 5. Painting x 3 </h2> 
+                <h1> 
+                Imaging Unseen Layers in Paintings. Press the left/right arrow key to select a painting; Press the enter key to make the painting to full screen; Press the left/right arrow key to switch the central image between the visible and the invisible radiation images;Press the up/down arrow key to change the transparency of the visble light photograph;Press the Enter key to go back to the menu page.
+                </h1>
+                <br>
+            <h2> 6. Vis the Universe </h2>
+                <h1> 
+                Visualizing the X-Ray Universe. Use the left/right arrow key to navigate differnt images through the slider.  
+                </h1>
+                <br>
+            <h2> 7. The Solar </h2>
+                <h1> 
+                Seeing the Active Sun: How Scientists View our Nearest Star. Use the left/right arrow key to navigate differnt videos through the slider. 
+                </h1>
+                <br>
+            <h2> 8. Object Map </h2>
+                <h1> 
+                Use mouse to select an object; Left click to reveal the metadata of the selcted object.
+                </h1>
+                <br>
+            <h2> 9. WWT </h2>
+                <h1> 
+                The Worldwide Telescope web app.
+                </h1>
+                <br>
+            <h2> 10. HAM </h2>
+                <h1> 
+                The official website of the Harvard Art Museums.
+                </h1>
+                <br>
+            <h2> 11. Rothko </h2>
+                <h1> 
+                Representation of MArk Rothko's Harvard Murals. Press the left/right arrow key to view different murals; Press the enter key to toggle the compensation images for the digital restoration.   
+                </h1>
+                <br>
+            <h2> 12. Box in Box </h2>
+                <h1> 
+                Infinite 3D digital Lightbox Gallery. 
+                </h1>
+                <br>
+            <h2> Enter Your URL </h2>
+                <h1> 
+                Copy and paste an URL in the type box to see how the content looks like in the video wall in the Lightbox Gallery. 
+                </h1>
+        </div>
+    </div>
+
+    
+    </body>
+</html>
