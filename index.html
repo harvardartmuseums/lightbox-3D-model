@@ -1,0 +1,944 @@
+<!doctype html>
+<html>
+
+
+<head>
+	<title> Virtual Lightbox Gallery </title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="http://fonts.typotheque.com/WF-023797-007265.css" />
+	<link type="text/css" rel="stylesheet" href="css/style.css" />
+	<link type="text/css" rel="stylesheet" href="css/5000_menu.css"/>
+	<style type="text/css"></style>
+	<script type="text/javascript" src="js/jquery-1.11.1.min.js"></script> 
+</head>
+
+
+<body>
+	<!-- ////////LOGO + PROJECT MENU//////// -->
+	<div id="btn_logo">
+		<img src="img/logo.png" title="Home" />
+		<ul id="panel_projects">
+			<li id="btn_0" title="The project on view in the Lightbox today" class="active"><h1> On View </h1></li>
+			<li id="btn_1" title="Framework #1: 3 by 3 image/video slideshows"><h1> 1. APPC </h1></li>
+			<li id="btn_2" title="Framework #2: 3 by 3 image slideshows"><h1> 2. HAM Archives </h1></li>
+			<li id="btn_3" title="Framework #3: 6 slideshows with audio (interactive)"><h1> 3. Anthro 1650 </h1></li>
+			<li id="btn_4" title="Framework #4: Painting viewer (interactive)"><h1> 4. Feke </h1></li>
+			<li id="btn_5" title="Framework #5: Multiple paintings viewer 1 (interactive)"><h1> 5. Paintings x 3 </h1></li>
+			<li id="btn_6" title="Framework #6: Image slider (interactive)"><h1> 6. Vis the Universe </h1></li>
+			<li id="btn_7" title="Framework #7: Video slider (interactive)"><h1> 7. The Solar </h1></li>
+			<li id="btn_8" title="Framework #8: Web app - WebGL (interactive)"><h1> 8. Object Map </h1></li>
+			<li id="btn_9" title="Framework #9: Web app (interactive)"><h1> 9. WWT </h1></li>
+			<li id="btn_10" title="Framework #10: Website (interactive)"><h1> 10. HAM </h1></li>
+			<li id="btn_11" title="Framework #11: Multiple paintings viewer 2 (interactive)"><h1> 11. Rothko </h1></li>
+			<li id="btn_12" title="Framework #12: Web app - complex (interactive)"><h1> 12. Box in Box </h1></li>
+			<li id="btn_url" style="margin-top:14px;padding-bottom:0px;">
+				<input type="url" id="myURL" placeholder="Put your website URL here" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Put your website URL here'" /><button id="urlclick"> GO </button>
+			</li>
+			<li id="btn_info" style="margin-top:20px;" title="Information and instructions">
+				<a href="index_info.html" target="_blank"><h1> Info </h1></a>
+			</li>
+		</ul>
+	</div>
+	<!-- ////////(END) LOGO + PROJECT MENU//////// -->
+
+
+	<!-- ///////////LIGHTBOX STAGE//////////////// -->
+	<div id="threeJS_webGL"></div>
+	<div id="threeJS_css3D"></div>	
+	<!-- //////////(END) LIGHTBOX STAGE////////// -->
+	
+	<script src="js/5000_menu.js"></script>
+	<!-- <script src="js/Three.js"></script> -->    <!-- July 2013 (three.js v59dev) -->
+	<!-- <script src="js/three-css3d.min.js"></script> -->
+	<script src="js/three.min.js"></script> 
+	<script src="js/CSS3DRenderer.js"></script>
+	<script src="js/Detector.js"></script>
+	<script src="js/Stats.js"></script>
+	<script src="js/OrbitControls.js"></script> 
+	<script src="js/THREEx.KeyboardState.js"></script>
+	<script src="js/THREEx.FullScreen.js"></script>
+	<script src="js/THREEx.WindowResize.js"></script>
+	<!-- <script src="TrackballControls.js"></script> -->
+
+
+	<script>
+		// threeJS webGL standard global variables
+		var scene, camera, renderer;
+		var container, controls, stats;
+		var clock = new THREE.Clock();
+		var keyboard = new THREEx.KeyboardState();
+		// threeJS webGL custom global variables
+		var cube;
+		var video, videoImage, videoImageContext, videoTexture;
+		var alpha_wall_n = 0.6;
+		var alpha_wall_e = 0.9;
+		var alpha_wall_w = 0.6;
+		var alpha_wall_s = 0.6;
+		var alpha_wall_g = 0.7;
+		var alpha_wall_o = 0.6;
+		// threeJS CSS3D renderer global variables
+		var scene_css3D, renderer_css3D;
+		var container_css3D, controls_css3D;
+
+
+
+
+		init();
+		animate();
+
+
+
+
+		function init() 
+		{
+			// I. SCENE (WebGL)
+			scene = new THREE.Scene();
+			
+			
+			// II. CAMERA
+			var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+			var VIEW_ANGLE = 75, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;	
+			camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+			scene.add(camera);
+			camera.position.set(0, 0, 400);    // (x, y=up, z=back)
+			camera.lookAt(scene.position);	
+
+
+			// III. RENDERER (WebGL)
+			if ( Detector.webgl )  renderer = new THREE.WebGLRenderer( {alpha: true, antialias: true} );	
+			else   renderer = new THREE.CanvasRenderer(); 
+
+			renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+			renderer.setClearColor( 0xffffff, 0);   //render bg color(hexColor, opacity)
+
+
+			// CONTROLS (WebGL)
+			container = document.getElementById( 'threeJS_webGL' );
+			container.appendChild( renderer.domElement );
+
+	
+			// EVENTS
+			THREEx.WindowResize(renderer, camera);
+			/*
+			THREEx.FullScreen.bindKey({ charCode : 'm'.charCodeAt(0) });
+			*/
+			
+
+			// CONTROLS (WebGL)
+			controls = new THREE.OrbitControls( camera, renderer.domElement );			
+			
+
+			// STATS
+			// displays current and past frames per second attained by scene
+			stats = new Stats();
+			stats.domElement.style.position = 'absolute';
+			stats.domElement.style.bottom = '0px';
+			stats.domElement.style.zIndex = 100;
+			container.appendChild( stats.domElement );
+
+
+			// LIGHT
+			var myLight_amb = new THREE.AmbientLight(0x404040);
+			var myLight_hem = new THREE.HemisphereLight( 0xffffff, 0x222222, 0.8 );
+			var myLight_dir_1 = new THREE.DirectionalLight( 0xaaaaaa, 0.8 );     
+			var myLight_dir_2 = new THREE.DirectionalLight( 0xcccccc, 0.6 );
+			var myLight_dir_3 = new THREE.DirectionalLight( 0x999999, 0.6 );
+			var myLight_poi = new THREE.PointLight(0x0033ff, 4, 200);
+			
+			myLight_amb.position.set(0, 0, 100);
+			//scene.add(myLight_amb);
+			myLight_hem.position.set(0, 0, 120);
+			scene.add(myLight_hem);
+			//scene.add(new THREE.HemisphereLightHelper(myLight_hem), 100);
+			myLight_dir_1.position.set(200, 800, 600);
+			scene.add(myLight_dir_1);
+			//scene.add(new THREE.DirectionalLightHelper(myLight_dir_1, 400));
+			myLight_dir_2.position.set(400, -200, 800);
+			scene.add(myLight_dir_2);
+			//scene.add(new THREE.DirectionalLightHelper(myLight_dir_2, 400));
+			myLight_dir_3.position.set(400, 600, -200);
+			scene.add(myLight_dir_3);
+			//scene.add(new THREE.DirectionalLightHelper(myLight_dir_3, 400));
+			//myLight_poi.position.set( 70, 5, 70 );
+			//scene.add(myLight_poi);
+			//scene.add(new THREE.PointLightHelper(myLight_poi, 10));
+
+
+			/*	
+			// AXEES HELPER		
+			var axes = new THREE.AxisHelper(100);
+			axes.position.set(0, 0, 0);
+			scene.add( axes );
+			*/
+	
+
+
+
+
+
+      		add_lightbox();
+
+
+
+
+
+
+      		/*
+      		////////////////////
+			// ON VIEW: IMAGE //
+			////////////////////
+      		var geometry_myImg = new THREE.PlaneGeometry(576, 324, 10, 10);
+			var texture_myImg = new THREE.ImageUtils.loadTexture( 'img/test.jpg' );
+			texture_myImg.minFilter = THREE.LinearFilter;
+			var material_myImg = new THREE.MeshBasicMaterial( { transparent: true, opacity: 1.0,color: 0xffffff, map: texture_myImg, side: THREE.DoubleSide } );
+			var myImg = new THREE.Mesh(geometry_myImg, material_myImg);
+			myImg.position.set(0, 0, 0);
+			myImg.rotation.x = 0;
+			scene.add(myImg);
+			*/
+
+
+			/*
+			////////////////////
+			// ON VIEW: VIDEO //
+			////////////////////
+			// create the video element
+			myVideo = document.createElement( 'video' );
+			// myVideo.id = 'video';
+			// myVideo.type = ' video/ogg; codecs="theora, vorbis" ';
+			myVideo.src = "media/test.mp4";
+			myVideo.load(); // must call after setting/changing source
+			myVideo.play();
+			myVideo.loop = true;
+			
+			// alternative method -- 
+			// create DIV in HTML:
+			// <video id="myVideo" autoplay style="display:none">
+			//		<source src="videos/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			// </video>
+			// and set JS variable:
+			// myVideo = document.getElementById( 'myVideo' );
+			
+			videoImage = document.createElement( 'canvas' );
+			videoImage.width = 1280;
+			videoImage.height = 546;
+
+			videoImageContext = videoImage.getContext( '2d' );
+			// background color if no video present
+			videoImageContext.fillStyle = '#000000';
+			videoImageContext.fillRect( 0, 0, videoImage.width, videoImage.height );
+
+			videoTexture = new THREE.Texture( videoImage );
+			videoTexture.minFilter = THREE.LinearFilter;
+			videoTexture.magFilter = THREE.LinearFilter;
+			
+			var movieMaterial = new THREE.MeshBasicMaterial( { map: videoTexture, overdraw: true, side:THREE.DoubleSide } );
+			// the geometry on which the movie will be displayed;
+			// movie image will be scaled to fit these dimensions.
+			var movieGeometry = new THREE.PlaneGeometry( 576, 324, 4, 4 );
+			var movieScreen = new THREE.Mesh( movieGeometry, movieMaterial );
+			movieScreen.position.set(0, 0, 0);
+			scene.add(movieScreen);
+			*/
+
+
+
+
+			////////////////////
+			// THREEJS: CSS3D //
+			////////////////////
+			// I. SCENE (CSS3D)
+			scene_css3D = new THREE.Scene();
+
+			// III. RENDERER (CSS3D)
+			renderer_css3D = new THREE.CSS3DRenderer({alpha: true });
+			renderer_css3D.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
+			renderer_css3D.setClearColor( 0xffffff, 0);
+			// renderer_css3D.domElement.style.position = 'absolute';
+			// renderer_css3D.domElement.style.top = 0;
+			// renderer_css3D.domElement.style.margin = 0;
+			// renderer_css3D.domElement.style.padding = 0;
+
+			// CONTAINER (CSS3D)
+			container_css3D = document.getElementById( 'threeJS_css3D' );
+			container_css3D.appendChild( renderer_css3D.domElement );
+			// container_css3D = document.createElement( 'div' );
+			// document.body.appendChild( container_css3D );
+			
+			THREEx.WindowResize(renderer_css3D, camera);
+
+			// CONTROLS (CSS3D)
+			controls_css3D = new THREE.OrbitControls( camera, renderer_css3D.domElement );
+			
+
+
+			// CUSTOM
+			var geometry_myImg_webGLframe = new THREE.PlaneBufferGeometry(576, 324, 10, 10);
+			var material_myImg_webGLframe = new THREE.MeshBasicMaterial( { wireframe: true, transparent: true, opacity: 0, color: 0x000000, side: THREE.DoubleSide } );
+			// any mesh using this material will act as a see-thru to the css renderer
+			material_myImg_webGLframe.blending  = THREE.NoBlending;
+			
+			var myImg_webGLframe = new THREE.Mesh(geometry_myImg_webGLframe, material_myImg_webGLframe);
+			myImg_webGLframe.position.set(0, 0, 0);
+			myImg_webGLframe.rotation.x = 0;
+			//scene.add(myImg_webGLframe);
+
+
+
+
+			//////////// DOM IMG CSS3D RENDERER //////////////////////////////////////
+			// create the dom Element
+			var element_img = document.createElement( 'img' );
+			element_img.src = 'img/9screens_b.jpg';
+			element_img.style.width = '1920px';
+			element_img.style.height = '1080px';
+			element_img.style.display = 'block';    //'none'
+			// create the object3d for this eleemnt
+			var object_img = new THREE.CSS3DObject( element_img );
+			// we reference the same position and rotation 
+			//object_img.position = myImg.position;
+			object_img.position.set(0, 0, -6);;
+			object_img.rotation.x = 0;
+			object_img.scale.x = 0.3;
+			object_img.scale.y = 0.3;
+			// add it to the css scene
+			scene_css3D.add(object_img);
+			//////////// (END) DOM IMG CSS3D RENDERER ////////////////////////////////
+
+			
+
+
+			//////////// DOM TEXT CSS3D RENDERER //////////////////////////////////////
+			var element_label = document.createElement( 'h1' );
+			element_label.textContent = "The Lightbox Gallery is a venue for digital experimentation—a space for projects that respond to the museums’ collections through new media and emerging technologies. Developed in collaboration with faculty, staff, stu- dents, and visiting artists, the projects showcased here use digital tools to reveal connections between objects and to play with traditional forms of display. Some of these projects are responsive, allowing users to navigate and manipulate the collections; others are cinematic, transforming the mu- seums into a landscape of digital performance. Exploration in the Lightbox is cross-disciplinary, merging a gallery experience with a digital lab.";
+			element_label.style.width = '1260px';
+			element_label.style.fontFamily = 'Neutral Medium 3';
+			element_label.style.fontSize = '34px';
+			element_label.style.lineHeight = '60px';
+			element_label.style.textAlign = 'left';
+			element_label.style.display = 'block';    
+
+			var object_label = new THREE.CSS3DObject( element_label );
+			object_label.position.set(-752, 10, 149);;
+			object_label.rotation.x = 0;
+			object_label.rotation.y = Math.PI/2;
+			object_label.scale.x = 0.04;
+			object_label.scale.y = 0.06;
+			scene_css3D.add(object_label);
+			////////////(END) DOM TEXT CSS3D RENDERER /////////////////////////////////
+
+
+
+
+			//////////// DOM WEBSITE CSS3D RENDERER //////////////////////////////////
+			var urls = 
+			[
+				[ 'http://apps.harvardartmuseums.org/lightbox/frameworks/index_onView.html', 0, 0, 0, 0, 0, 0 ],
+				// [ 'http://www.harvardartmuseums.org/', 0, 0, 100, 0, 0, 0 ],
+				// [ 'http://boschproject.org/viewer.html?mode=curtain&layout=top-major&images=tile_images/29_30_31_MCPVIS_web.dzi,tile_images/29_30_31_MCPIRP.dzi,tile_images/29_30_31_IRREFL_web.dzi', 100, 0, 0, 0, 1.57, 0 ],
+				// [ 'http://mrdoob.com/projects/chromeexperiments/ball_pool/', 0, 0, -100, 0, 3.14, 0 ],
+				// [ 'http://mrdoob.com/lab/javascript/effects/fire/01/', - 100, 0, 0, 0, 4.71, 0 ],
+				// [ 'http://mrdoob.com/lab/javascript/effects/solitaire/', 0, 100, 0, 4.71, 0, 0 ],
+				// [ 'http://mrdoob.com/projects/code-editor/', 0, -100, 0, 1.57, 0, 0 ]
+			];
+			/*
+			http://mrdoob.com/projects/chromeexperiments/ball-pool/
+			http://lightbox-staging.herokuapp.com/
+			http://apps.harvardartmuseums.org/appc_lightbox_demo/
+			http://apps.harvardartmuseums.org/appc_lightbox_demo/media/appc_5min_720p.mp4
+			http://apps.harvardartmuseums.org/lightbox_3D_demo/index.html
+			http://apps.harvardartmuseums.org/lightbox_3D_demo/index_test.html
+			http://apps.harvardartmuseums.org/lightbox_3D_demo/index_test_2.html
+			http://apps.harvardartmuseums.org/lightbox_3D_demo/index_webglcss3d.html
+			http://thetypology.com/filter/harvard
+			http://www.sardisexpedition.org/
+			https://player.vimeo.com/video/111057446
+			http://www.nytimes.com/projects/2012/snow-fall/#/?part=tunnel-creek
+			http://www.harvardartmuseums.org/tour/art-science/stop/128
+			http://magazine.harvardartmuseums.org/
+			*/
+
+
+			for ( var i = 0; i < urls.length; i ++ ) 
+			{
+				var element_iframe = document.createElement( 'iframe' );
+				element_iframe.src = urls[ i ][ 0 ];
+				element_iframe.style.width = '1024px';
+				element_iframe.style.height = '576px';
+				element_iframe.style.border = '0px';
+
+
+
+document.getElementById("btn_0").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_onView.html";
+    return false;
+}
+document.getElementById("btn_1").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_appc.html";
+    return false;
+}
+document.getElementById("btn_2").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_archive.html";
+    return false;
+}
+document.getElementById("btn_3").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_anthro1650.html";
+    return false;
+}
+document.getElementById("btn_4").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_feke.html";
+    return false;
+}
+document.getElementById("btn_5").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_3paintings.html";
+    return false;
+}
+document.getElementById("btn_6").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_joe.html";
+    return false;
+}
+document.getElementById("btn_7").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_solar.html";
+    return false;
+}
+document.getElementById("btn_8").onclick = function() {
+    element_iframe.src = "http://lightbox-staging.herokuapp.com/";
+    return false;
+}
+document.getElementById("btn_9").onclick = function() {
+    element_iframe.src = "http://www.worldwidetelescope.org/webclient/";
+    return false;
+}
+document.getElementById("btn_10").onclick = function() {
+    element_iframe.src = "http://www.harvardartmuseums.org/";
+    return false;
+}
+document.getElementById("btn_11").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/frameworks/index_rothko.html";
+    return false;
+}
+document.getElementById("btn_12").onclick = function() {
+    element_iframe.src = "http://apps.harvardartmuseums.org/lightbox/index_test.html";
+    return false;
+}
+document.getElementById("urlclick").onclick = function() {
+    element_iframe.src = this.previousSibling.value; 
+    return false;
+}
+document.getElementById("btn_url").onkeypress = function(event) {
+	event = event || window.event;
+    if (event.keyCode === 13) {
+        document.getElementById("urlclick").onclick();
+    }
+}
+
+
+
+				var object_iframe = new THREE.CSS3DObject( element_iframe );
+				object_iframe.position.set( urls[ i ][ 1 ], urls[ i ][ 2 ], urls[ i ][ 3 ] );
+				object_iframe.rotation.set( urls[ i ][ 4 ], urls[ i ][ 5 ], urls[ i ][ 6 ] );
+				object_iframe.scale.x = 0.5625;
+				object_iframe.scale.y = 0.5625;
+				scene_css3D.add( object_iframe );
+			}
+			//////////// (END) DOM WEBSITE CSS3D RENDERER /////////////////////////////
+
+
+	
+
+			//////////// DOM DIV CSS3D RENDERER //////////////////////////////////////
+			// 9 SCREENS: BACKGROUND (CSS3D)
+			var element_9screens_bg = document.createElement( 'div' );
+			element_9screens_bg.style.backgroundColor = '#ffffff';
+			element_9screens_bg.style.width = '1920px';
+			element_9screens_bg.style.height = '1080px';
+			
+			var object_element_9screens_bg = new THREE.CSS3DObject( element_9screens_bg );
+			object_element_9screens_bg.position.set(0, 0, -5);;
+			object_element_9screens_bg.rotation.x = 0;
+			object_element_9screens_bg.scale.x = 0.3;
+			object_element_9screens_bg.scale.y = 0.3;
+			scene_css3D.add( object_element_9screens_bg );
+
+			// 9 SCREENS: BEZEL (CSS3D)
+			for (var i = 0; i < 4; i++)
+			{
+				var element_line_ver = document.createElement( 'div' );
+				element_line_ver.style.backgroundColor = '#000000';
+				element_line_ver.style.width = '1px';
+				element_line_ver.style.height = '324px';
+				
+				var object_line_ver = new THREE.CSS3DObject( element_line_ver );
+				object_line_ver.position. set(-288 + i*192, 0, 1);
+				scene_css3D.add( object_line_ver );
+			}
+
+			for (var i = 0; i < 4; i++)
+			{
+				var element_line_hor = document.createElement( 'div' );
+				element_line_hor.style.backgroundColor = '#000000';
+				element_line_hor.style.width = '576px';
+				element_line_hor.style.height = '1px';
+				
+				var object_line_hor = new THREE.CSS3DObject( element_line_hor );
+				object_line_hor.position. set(0, -162 + i*108, 1);
+				scene_css3D.add( object_line_hor );
+			}
+			//////////// (END) DOM DIV CSS3D RENDERER /////////////////////////////////
+		}
+
+
+
+
+
+		function animate() 
+		{
+		    requestAnimationFrame( animate );
+			render();		
+			update();
+		}
+
+		function update()
+		{
+			if ( keyboard.pressed("space") ) 
+			{ 
+				controls.reset();
+				controls_css3D.reset();
+			}
+			
+			//WebGL
+			controls.update();
+			//CSS3D
+			controls_css3D.update();
+
+			stats.update();
+		}
+
+		function render() 
+		{
+			/*
+			if ( myVideo.readyState === myVideo.HAVE_ENOUGH_DATA ) 
+			{
+				videoImageContext.drawImage( myVideo, 0, 0 );
+				if ( videoTexture )   videoTexture.needsUpdate = true;
+			}
+			*/
+			//WebGL
+			renderer.render( scene, camera );
+			//CSS3D
+			renderer_css3D.render( scene_css3D, camera );
+		}
+
+
+
+
+		function add_lightbox()
+		{
+			/////////////////
+			//   CEILING   //
+			/////////////////
+			// Ceiling: 1
+			var geometry_ceiling_1 = new THREE.PlaneBufferGeometry(1504, 170, 10, 10);
+			var material_ceiling_1 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var ceiling_1 = new THREE.Mesh(geometry_ceiling_1, material_ceiling_1);
+			ceiling_1.position.set(0, 320, 64);
+			ceiling_1.rotation.x = Math.PI / 2;
+			scene.add(ceiling_1);
+
+
+			// Ceiling: 2
+			var geometry_ceiling_2 = new THREE.PlaneBufferGeometry(1504, 274, 10, 10);
+			var material_ceiling_2 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var ceiling_2 = new THREE.Mesh(geometry_ceiling_2, material_ceiling_2);
+			ceiling_2.position.set(0, 457, 149);
+			ceiling_2.rotation.x = Math.PI / 1;
+			scene.add(ceiling_2);
+
+
+			// Ceiling: Pipe
+			var geometry_ceiling_pipe = new THREE.CylinderGeometry( 60, 60, 1504, 40, 1);
+			// radiusAtTop, radiusAtBottom, height, segmentsAroundRadius, segmentsAlongHeight
+			var material_ceiling_pipe = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var ceiling_pipe = new THREE.Mesh(geometry_ceiling_pipe, material_ceiling_pipe);
+			ceiling_pipe.position.set(0, 449, 233);
+			ceiling_pipe.rotation.z = Math.PI / 2;
+			scene.add(ceiling_pipe);
+
+
+			// Ceiling: Light Bars
+			for (var i = 0; i < 5; i++){
+				var geometry_lightBar = new THREE.BoxGeometry( 6, 18, 398, 1, 1, 1 );
+				var material_lightBar = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+				var lightBar = new THREE.Mesh(geometry_lightBar, material_lightBar);
+				lightBar.position.set(-520 + i*260, 330, 347);
+				scene.add(lightBar);
+			}
+
+
+
+
+			/////////////////
+			//  EAST WALL  //
+			/////////////////
+			/*
+			// WALL--EAST: INDEX
+			var geometry_wall_e = new THREE.PlaneGeometry(1512, 888, 10, 10);
+			var texture_wall_e = new THREE.ImageUtils.loadTexture( 'img/index/wall_e_orig.png' );
+			var material_wall_e = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.8, color: 0xffffff, map: texture_wall_e, side: THREE.DoubleSide } );
+			var wall_e = new THREE.Mesh(geometry_wall_e, material_wall_e);
+			wall_e.position.set(0, 218, -20);
+			wall_e.rotation.x = 0;
+			scene.add(wall_e);
+			*/
+			// WALL--EAST: CENTRAL
+			var geometry_wall_e_c = new THREE.PlaneBufferGeometry(742, 546, 10, 10);
+			var material_wall_e_c = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var wall_e_c = new THREE.Mesh(geometry_wall_e_c, material_wall_e_c);
+			wall_e_c.position.set(0, 47, -18);
+			wall_e_c.rotation.x = 0;
+			scene.add(wall_e_c);
+
+			// WALL--EAST: N 1
+			var geometry_wall_e_n_1 = new THREE.PlaneBufferGeometry(290, 77, 10, 10);
+			var material_wall_e_n_1 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var wall_e_n_1 = new THREE.Mesh(geometry_wall_e_n_1, material_wall_e_n_1);
+			wall_e_n_1.position.set(-516, 281, -18);
+			wall_e_n_1.rotation.x = 0;
+			scene.add(wall_e_n_1);
+
+			// WALL--EAST: N 2
+			var geometry_wall_e_n_2 = new THREE.PlaneBufferGeometry(90, 546, 10, 10);
+			var material_wall_e_n_2 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var wall_e_n_2 = new THREE.Mesh(geometry_wall_e_n_2, material_wall_e_n_2);
+			wall_e_n_2.position.set(-706, 47, -18);
+			wall_e_n_2.rotation.x = 0;
+			scene.add(wall_e_n_2);
+
+			// WALL--EAST: N DOOR CENTRAL
+			var geometry_door_e_n_c = new THREE.PlaneBufferGeometry(290, 470, 10, 10);
+			var texture_door = new THREE.ImageUtils.loadTexture( 'img/door.png' );
+			texture_door.minFilter = THREE.LinearFilter;
+			var material_door_e_n_c = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.6, alphaTest: 0.1, color: 0xffffff, map: texture_door, side: THREE.DoubleSide } );
+			var door_e_n_c = new THREE.Mesh(geometry_door_e_n_c, material_door_e_n_c);
+			door_e_n_c.position.set(-516, 8, -98);
+			door_e_n_c.rotation.x = 0;
+			scene.add(door_e_n_c);
+
+			// WALL--EAST: N DOOR 1
+			var geometry_door_e_n_1 = new THREE.PlaneBufferGeometry(112, 470, 10, 10);
+			var material_door_e_n_1 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var door_e_n_1 = new THREE.Mesh(geometry_door_e_n_1, material_door_e_n_1);
+			door_e_n_1.position.set(-371, 8, -74);
+			door_e_n_1.rotation.y = Math.PI / 2;
+			scene.add(door_e_n_1);
+
+			// WALL--EAST: N DOOR 2
+			var geometry_door_e_n_2 = new THREE.PlaneBufferGeometry(112, 470, 10, 10);
+			var material_door_e_n_2 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var door_e_n_2 = new THREE.Mesh(geometry_door_e_n_2, material_door_e_n_2);
+			door_e_n_2.position.set(-661, 8, -74);
+			door_e_n_2.rotation.y = Math.PI / 2;
+			scene.add(door_e_n_2);
+
+			// WALL--EAST: N DOOR TOP
+			var geometry_door_e_n_3 = new THREE.PlaneBufferGeometry(290, 112, 10, 10);
+			var material_door_e_n_3 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var door_e_n_3 = new THREE.Mesh(geometry_door_e_n_3, material_door_e_n_3);
+			door_e_n_3.position.set(-516, 243, -74);
+			door_e_n_3.rotation.x = Math.PI / 2;
+			scene.add(door_e_n_3);
+
+
+
+			// WALL--EAST: S 1
+			var geometry_wall_e_s_1 = new THREE.PlaneBufferGeometry(290, 77, 10, 10);
+			var material_wall_e_s_1 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var wall_e_s_1 = new THREE.Mesh(geometry_wall_e_s_1, material_wall_e_s_1);
+			wall_e_s_1.position.set(516, 281, -18);
+			wall_e_s_1.rotation.x = 0;
+			scene.add(wall_e_s_1);
+
+			// WALL--EAST: S 2
+			var geometry_wall_e_s_2 = new THREE.PlaneBufferGeometry(90, 546, 10, 10);
+			var material_wall_e_s_2 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var wall_e_s_2 = new THREE.Mesh(geometry_wall_e_s_2, material_wall_e_s_2);
+			wall_e_s_2.position.set(706, 47, -18);
+			wall_e_s_2.rotation.x = 0;
+			scene.add(wall_e_s_2);
+
+			// WALL--EAST: S DOOR CENTRAL
+			var geometry_door_e_s_c = new THREE.PlaneBufferGeometry(290, 470, 10, 10);
+			var texture_door = new THREE.ImageUtils.loadTexture( 'img/door.png' );
+			texture_door.minFilter = THREE.LinearFilter;
+			var material_door_e_s_c = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.6, alphaTest: 0.1, color: 0xffffff, map: texture_door, side: THREE.DoubleSide } );
+			var door_e_s_c = new THREE.Mesh(geometry_door_e_s_c, material_door_e_s_c);
+			door_e_s_c.position.set(516, 8, -98);
+			door_e_s_c.rotation.x = 0;
+			scene.add(door_e_s_c);
+
+			// WALL--EAST: S DOOR 1
+			var geometry_door_e_s_1 = new THREE.PlaneBufferGeometry(112, 470, 10, 10);
+			var material_door_e_s_1 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var door_e_s_1 = new THREE.Mesh(geometry_door_e_s_1, material_door_e_s_1);
+			door_e_s_1.position.set(371, 8, -74);
+			door_e_s_1.rotation.y = Math.PI / 2;
+			scene.add(door_e_s_1);
+
+			// WALL--EAST: S DOOR 2
+			var geometry_door_e_s_2 = new THREE.PlaneBufferGeometry(112, 470, 10, 10);
+			var material_door_e_s_2 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var door_e_s_2 = new THREE.Mesh(geometry_door_e_s_2, material_door_e_s_2);
+			door_e_s_2.position.set(661, 8, -74);
+			door_e_s_2.rotation.y = Math.PI / 2;
+			scene.add(door_e_s_2);
+
+			// WALL--EAST: S DOOR TOP
+			var geometry_door_e_s_3 = new THREE.PlaneBufferGeometry(290, 112, 10, 10);
+			var material_door_e_s_3 = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_e, color: 0xffffff, side: THREE.DoubleSide } );
+			var door_e_s_3 = new THREE.Mesh(geometry_door_e_s_3, material_door_e_s_3);
+			door_e_s_3.position.set(516, 243, -74);
+			door_e_s_3.rotation.x = Math.PI / 2;
+			scene.add(door_e_s_3);
+
+
+
+			/////////////////
+			//  WEST WALL  //
+			/////////////////
+			/*
+			// WALL--WEST: INDEX
+			var geometry_wall_w = new THREE.PlaneGeometry(1920, 888, 10, 10);
+			var texture_wall_w = new THREE.ImageUtils.loadTexture( 'img/index/wall_w_orig.png' );
+			var material_wall_w = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.8, color: 0xffffff, map: texture_wall_w, side: THREE.DoubleSide } );
+			var wall_w = new THREE.Mesh(geometry_wall_w, material_wall_w);
+			wall_w.position.set(0, 218, 630);
+			wall_w.rotation.x = 0;
+			scene.add(wall_w);
+			*/
+			var geometry_wall_w = new THREE.PlaneBufferGeometry(1546, 888, 10, 10);
+			var texture_wall_w = new THREE.ImageUtils.loadTexture( 'img/wall_w.png' );
+			texture_wall_w.minFilter = THREE.LinearFilter;
+			var material_wall_w = new THREE.MeshBasicMaterial( { transparent: true, opacity: alpha_wall_w, alphaTest: 0.1, color: 0xffffff, map: texture_wall_w, side: THREE.DoubleSide } );
+			var wall_w = new THREE.Mesh(geometry_wall_w, material_wall_w);
+			wall_w.position.set(0, 218, 630);
+			wall_w.rotation.x = 0;
+			scene.add(wall_w);
+
+
+			// Poles
+			for (var i = 0; i < 2; i++){
+				var geometry_pole = new THREE.CylinderGeometry( 8, 8, 888, 20, 1 );
+				var material_pole = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+				var pole = new THREE.Mesh(geometry_pole, material_pole);
+				pole.position.set(-258 + i*514, 214, 588);
+				scene.add(pole);
+			}
+
+
+
+
+			/////////////////
+			// NORTH WALL  //
+			/////////////////
+			/*
+			// WALL--NORTH: INDEX
+			var geometry_wall_n = new THREE.PlaneGeometry(702, 1151, 10, 10);
+			var texture_wall_n = new THREE.ImageUtils.loadTexture( 'img/index/wall_n_orig.png' );
+			var material_wall_n = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.8, color: 0xffffff, map: texture_wall_n, side: THREE.DoubleSide } );
+			var wall_n = new THREE.Mesh(geometry_wall_n, material_wall_n);
+			wall_n.position.set(-752, 348, 330);
+			wall_n.rotation.x = 0;
+			wall_n.rotation.y = -Math.PI / 2 *3;
+			scene.add(wall_n);
+			*/
+			var geometry_wall_n = new THREE.PlaneBufferGeometry(702, 1151, 10, 10);
+			var texture_wall_n = new THREE.ImageUtils.loadTexture( 'img/wall_n.png' );
+			texture_wall_n.minFilter = THREE.LinearFilter;
+			var material_wall_n = new THREE.MeshBasicMaterial( { transparent: true, opacity: alpha_wall_n, alphaTest: 0.1, color: 0xffffff, map: texture_wall_n, side: THREE.DoubleSide } );
+			var wall_n = new THREE.Mesh(geometry_wall_n, material_wall_n);
+			wall_n.position.set(-752, 348, 330);
+			wall_n.rotation.x = 0;
+			wall_n.rotation.y = -Math.PI / 2 *3;
+			scene.add(wall_n);
+
+
+
+
+			/////////////////
+			// SOUTH WALL  //
+			/////////////////
+			/*
+			// WALL--SOUTH: INDEX
+			var geometry_wall_s = new THREE.PlaneGeometry(702, 1151, 10, 10);
+			var texture_wall_s = new THREE.ImageUtils.loadTexture( 'img/index/wall_s_orig.png' );
+			var material_wall_s = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.5, color: 0xffffff, map: texture_wall_s, side: THREE.DoubleSide } );
+			var wall_s = new THREE.Mesh(geometry_wall_s, material_wall_s);
+			wall_s.position.set(752, 348, 330);
+			wall_s.rotation.x = 0;
+			wall_s.rotation.y = -Math.PI / 2;
+			scene.add(wall_s);
+			*/
+			var geometry_wall_s = new THREE.PlaneBufferGeometry(702, 1151, 10, 10);
+			var texture_wall_s = new THREE.ImageUtils.loadTexture( 'img/wall_s.png' );
+			texture_wall_s.minFilter = THREE.LinearFilter;
+			var material_wall_s = new THREE.MeshBasicMaterial( { transparent: true, opacity: alpha_wall_s, alphaTest: 0.1, color: 0xffffff, map: texture_wall_s, side: THREE.DoubleSide } );
+			var wall_s = new THREE.Mesh(geometry_wall_s, material_wall_s);
+			wall_s.position.set(752, 348, 330);
+			wall_s.rotation.x = 0;
+			wall_s.rotation.y = -Math.PI / 2;
+			scene.add(wall_s);
+
+
+
+
+			/////////////////
+			//   GROUND    //
+			/////////////////
+			/*
+			// GROUND: INDEX
+			var geometry_ground = new THREE.PlaneGeometry(1920, 1080, 10, 10);
+			var texture_ground = new THREE.ImageUtils.loadTexture( 'img/index/ground_orig.png' );
+			var material_ground = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.5,color: 0xffffff, map: texture_ground, side: THREE.DoubleSide } );
+			var ground = new THREE.Mesh(geometry_ground, material_ground);
+			ground.position.set(0, -226, 204);
+			ground.rotation.x = Math.PI / 2;
+			ground.rotation.z = Math.PI / 1;
+			scene.add(ground);
+			*/
+			var geometry_ground = new THREE.PlaneBufferGeometry(1920, 1080, 10, 10);
+			var texture_ground = new THREE.ImageUtils.loadTexture( 'img/ground.png' );
+			texture_ground.minFilter = THREE.LinearFilter;
+			var material_ground = new THREE.MeshBasicMaterial( { transparent: true, opacity: alpha_wall_g, alphaTest: 0.1, color: 0xffffff, map: texture_ground, side: THREE.DoubleSide } );
+			var ground = new THREE.Mesh(geometry_ground, material_ground);
+			ground.position.set(0, -226, 204);
+			ground.rotation.x = Math.PI / 2;
+			ground.rotation.z = Math.PI / 1;
+			scene.add(ground);
+
+
+
+			/////////////////
+			// PROJECTORS  //
+			/////////////////
+			// Projector S Body
+			var geometry_projector_s_b = new THREE.BoxGeometry( 60, 32, 70, 1, 1, 1 );
+			var material_projector_s_b = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+			var projector_s_b = new THREE.Mesh(geometry_projector_s_b, material_projector_s_b);
+			projector_s_b.position.set(254, 234, 60);
+			scene.add(projector_s_b);
+
+
+			// Projector S Len
+			var geometry_projector_s_l = new THREE.CylinderGeometry( 10, 10, 10, 20, 1 );
+			var material_projector_s_l = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+			var projector_s_l = new THREE.Mesh(geometry_projector_s_l, material_projector_s_l);
+			projector_s_l.position.set(264, 234, 100);
+			projector_s_l.rotation.x = Math.PI / 2;
+			scene.add(projector_s_l);
+
+
+			// Projector S Pole
+			var geometry_projector_s_p = new THREE.CylinderGeometry( 4, 4, 86, 20, 1 );
+			var material_projector_s_p = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+			var projector_s_p = new THREE.Mesh(geometry_projector_s_p, material_projector_s_p);
+			projector_s_p.position.set(254, 276, 60);
+			scene.add(projector_s_p);
+
+
+
+			// Projector N Body
+			var geometry_projector_n_b = new THREE.BoxGeometry( 60, 32, 70, 1, 1, 1 );
+			var material_projector_n_b = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+			var projector_n_b = new THREE.Mesh(geometry_projector_n_b, material_projector_n_b);
+			projector_n_b.position.set(-254, 234, 60);
+			scene.add(projector_n_b);
+
+
+			// Projector N Len
+			var geometry_projector_n_l = new THREE.CylinderGeometry( 10, 10, 10, 20, 1 );
+			var material_projector_n_l = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+			var projector_n_l = new THREE.Mesh(geometry_projector_n_l, material_projector_n_l);
+			projector_n_l.position.set(-244, 234, 100);
+			projector_n_l.rotation.x = Math.PI / 2;
+			scene.add(projector_n_l);
+
+
+			// Projector N Pole
+			var geometry_projector_n_p = new THREE.CylinderGeometry( 4, 4, 86, 20, 1 );
+			var material_projector_n_p = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+			var projector_n_p = new THREE.Mesh(geometry_projector_n_p, material_projector_n_p);
+			projector_n_p.position.set(-254, 276, 60);
+			scene.add(projector_n_p);
+
+
+
+
+			/////////////////
+			//   SPEAKERS  //
+			/////////////////
+			// Speakers
+			for (var i = 0; i < 4; i++){
+				var geometry_speaker = new THREE.BoxGeometry( 30, 20, 20, 1, 1, 1 );
+				var material_speaker = new THREE.MeshLambertMaterial( { transparent: true, opacity: alpha_wall_o, color: 0xffffff, side: THREE.DoubleSide } );
+				var speaker = new THREE.Mesh(geometry_speaker, material_speaker);
+				speaker.position.set(-570 + i*380, 350, 162);
+				speaker.rotation.x = Math.PI / 8
+				scene.add(speaker);
+			}
+
+
+			
+
+			/////////////////
+			//  9 SCREENS  //
+			/////////////////
+			/*
+			// 9 SCREENS: INDEX
+			var geometry_9screens = new THREE.PlaneGeometry(576, 324, 10, 10);
+			var texture_9screens = new THREE.ImageUtils.loadTexture( 'img/index/9screens_orig.png' );
+			var material_9screens = new THREE.MeshBasicMaterial( { transparent: true, opacity: 1.0,color: 0xffffff, map: texture_9screens, side: THREE.DoubleSide } );
+			var _9screens = new THREE.Mesh(geometry_9screens, material_9screens);
+			_9screens.position.set(0, 0, 0);
+			_9screens.rotation.x = 0;
+			scene.add(_9screens);
+			*/
+			// 9 SCREENS: MOUNTING
+			var geometry_9screens_mounting = new THREE.BoxGeometry( 576, 324, 14, 3, 3, 1 );
+			var material_9screens_mounting = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.8, wireframe: true, color: 0x000000, side: THREE.DoubleSide } );
+			var _9screens_mounting = new THREE.Mesh(geometry_9screens_mounting, material_9screens_mounting);
+			_9screens_mounting.position.set(0, 0, -11);
+			scene.add(_9screens_mounting);
+
+
+			// 9 SCREENS: MONITOR
+			var geometry_9screens_monitor = new THREE.BoxGeometry( 576, 324, 4, 1, 1, 1 );
+			var material_9screens_monitor = new THREE.MeshBasicMaterial( { transparent: true, opacity: 0.8, color: 0x000000, side: THREE.DoubleSide } );
+			var _9screens_monitor = new THREE.Mesh(geometry_9screens_monitor, material_9screens_monitor);
+			_9screens_monitor.position.set(0, 0, -4);
+			scene.add(_9screens_monitor);
+
+
+			// 9 SCREENS: BEZEL (WEBGL)
+			for (var i = 0; i < 4; i++){
+				var geometry_line_ver = new THREE.Geometry();
+				var vertArray_ver = geometry_line_ver.vertices;
+				vertArray_ver.push( new THREE.Vector3(-288 + i*192, -162, 1), new THREE.Vector3(-288 + i*192, 162, 1) );
+				geometry_line_ver.computeLineDistances();
+				var material_line_ver = new THREE.LineBasicMaterial( { color: 0x000000 } );
+				var line_ver = new THREE.Line( geometry_line_ver, material_line_ver );
+				scene.add(line_ver);
+			}
+			for (var i = 0; i < 4; i++){
+				var geometry_line_hor = new THREE.Geometry();
+				var vertArray_hor = geometry_line_hor.vertices;
+				vertArray_hor.push( new THREE.Vector3(-288, -162 + i*108, 1), new THREE.Vector3(288, -162 + i*108, 1) );
+				geometry_line_hor.computeLineDistances();
+				var material_line_hor = new THREE.LineBasicMaterial( { color: 0x000000 } );
+				var line_hor = new THREE.Line( geometry_line_hor, material_line_hor );
+				scene.add(line_hor);
+			}
+		}
+	</script>
+</body>
+</html>
