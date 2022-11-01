@@ -1,5 +1,12 @@
+# :warning: ARCHIVED
+
+The Lightbox program ended on July 31, 2022. All associated projects have been retired and are no longer supported.
+
 # lightbox
 3D interactive virtual Lightbox Gallery web app
+
+![lightbox-3d-demo](https://user-images.githubusercontent.com/3187493/199345075-fae56baf-164a-4225-af6f-19ef8395607c.gif)
+
 
 Virtual Lightbox Gallery is a collaboration tool for Harvard Art Museums to inspire collaborators and overcome the challenges in project development at Lightbox Gallery. The interactive 3D web app serves as a platform for both remote and local collaborators to view and test their digital projects in the virtual gallery by entering a URL. The app also provides 12 sample projects and allows users to explore and interact in order to gain deeper understanding of the abilities and possibilities of Lightbox Gallery.
 
